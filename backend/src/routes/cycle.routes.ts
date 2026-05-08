@@ -1,18 +1,24 @@
+// ─── Rutas de Ciclos ─────────────────────────────────────────────────────
+// Todas las rutas requieren autenticación.
+// Las rutas con :id además validan ownership (que el ciclo sea de la usuaria).
+
 import express from "express";
-import { getCycles, getCycleById, createCycle, updateCycle, deleteCycle } from "../controllers/cycle.controller";
+import {
+  getCycles, getCycleById, createCycle, updateCycle, deleteCycle
+} from "../controllers/cycle.controller";
+import { requireAuth, requireOwnership } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
-// GET    /api/cycles       — lista todos los ciclos
-// POST   /api/cycles       — crea un nuevo ciclo
+// Todas las rutas pasan primero por requireAuth
+router.use(requireAuth);
+
 router.get("/", getCycles);
 router.post("/", createCycle);
 
-// GET    /api/cycles/:id   — obtiene un ciclo por ID
-// PUT    /api/cycles/:id   — actualiza un ciclo por ID
-// DELETE /api/cycles/:id   — elimina un ciclo por ID
-router.get("/:id", getCycleById);
-router.put("/:id", updateCycle);
-router.delete("/:id", deleteCycle);
+// Rutas con :id requieren además ser la dueña del recurso
+router.get("/:id", requireOwnership("Cycle"), getCycleById);
+router.put("/:id", requireOwnership("Cycle"), updateCycle);
+router.delete("/:id", requireOwnership("Cycle"), deleteCycle);
 
 export default router;

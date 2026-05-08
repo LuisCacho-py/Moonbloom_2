@@ -1,18 +1,21 @@
+// ─── Rutas de DailyLogs ──────────────────────────────────────────────────
+// Mismo patrón que cycles: requireAuth global + requireOwnership en :id.
+
 import express from "express";
-import { getDailyLogs, getDailyLogById, createDailyLog, updateDailyLog, deleteDailyLog } from "../controllers/dailyLog.controller";
+import {
+  getDailyLogs, getDailyLogById, createDailyLog, updateDailyLog, deleteDailyLog
+} from "../controllers/dailyLog.controller";
+import { requireAuth, requireOwnership } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
-// GET    /api/dailylogs       — lista todos los registros diarios
-// POST   /api/dailylogs       — crea un nuevo registro diario
+router.use(requireAuth);
+
 router.get("/", getDailyLogs);
 router.post("/", createDailyLog);
 
-// GET    /api/dailylogs/:id   — obtiene un registro por ID
-// PUT    /api/dailylogs/:id   — actualiza un registro por ID
-// DELETE /api/dailylogs/:id   — elimina un registro por ID
-router.get("/:id", getDailyLogById);
-router.put("/:id", updateDailyLog);
-router.delete("/:id", deleteDailyLog);
+router.get("/:id", requireOwnership("DailyLog"), getDailyLogById);
+router.put("/:id", requireOwnership("DailyLog"), updateDailyLog);
+router.delete("/:id", requireOwnership("DailyLog"), deleteDailyLog);
 
 export default router;

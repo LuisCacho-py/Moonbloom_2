@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Registra tu día</title>
+</head>
+<body style="margin:0;padding:0;background:#FAF4F7;font-family:Arial,sans-serif;color:#333;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#FAF4F7;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(142,58,89,.08);">
+          <tr>
+            <td style="background:#C68FA8;padding:28px 24px;text-align:center;color:#fff;">
+              <div style="font-size:40px;line-height:1;">🌙</div>
+              <h1 style="margin:8px 0 0;font-size:22px;">Hola {{name}}, ¿cómo te sentiste hoy?</h1>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px 28px;">
+              <p style="font-size:15px;line-height:1.6;margin:0 0 16px;">
+                Hoy es <strong>{{dateStr}}</strong> y aún no tienes registro del día en MoonBloom.
+              </p>
+
+              <p style="font-size:15px;line-height:1.6;margin:0 0 24px;">
+                Tomar 30 segundos para anotar cómo te sientes te ayudará a descubrir
+                patrones en tu cuerpo a lo largo de tu ciclo.
+              </p>
+
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding:8px 0 16px;">
+                    <a href="{{appUrl}}/registros/nuevo"
+                       style="background:#8E3A59;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:bold;display:inline-block;">
+                      Registrar mi día
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="font-size:13px;color:#888;margin:24px 0 0;line-height:1.5;text-align:center;">
+                ¿Ya no quieres recibir estos recordatorios?<br>
+                Puedes desactivarlos desde tu <a href="{{appUrl}}/perfil" style="color:#8E3A59;">perfil</a>.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background:#F4E6EC;padding:16px;text-align:center;font-size:12px;color:#888;">
+              MoonBloom — Tu ciclo, tu bienestar 🌸
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

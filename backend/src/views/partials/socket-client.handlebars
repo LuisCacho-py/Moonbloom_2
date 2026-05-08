@@ -1,0 +1,78 @@
+<!-- ── Cliente de Socket.io ─────────────────────────────────────────────
+     Se incluye en el layout principal (main.handlebars) para que cualquier
+     página privada reciba notificaciones en vivo.
+     Requiere que la usuaria tenga la cookie 'token' (JWT) — Socket.io la
+     lee automáticamente del header de cookies en el handshake.
+────────────────────────────────────────────────────────────────────── -->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  (function () {
+    if (typeof io === "undefined") return;
+
+    const socket = io({ withCredentials: true });
+
+    socket.on("connect", () => console.log("[socket] conectada"));
+
+    socket.on("connect_error", (err) => {
+      console.warn("[socket] error de conexión:", err.message);
+    });
+
+    // ── Helper para mostrar toasts ──────────────────────────────────
+    function showToast({ title, message, actionUrl }) {
+      const toastEl = document.createElement("div");
+      toastEl.style.cssText = `
+        position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+        background: #fff; border-left: 4px solid #8E3A59;
+        padding: 14px 18px; border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(142,58,89,.18);
+        max-width: 320px; font-family: Arial, sans-serif;
+        animation: mb-toast-in .3s ease-out;
+      `;
+      toastEl.innerHTML = `
+        <strong style="color:#8E3A59;display:block;margin-bottom:4px;">${title}</strong>
+        <span style="color:#555;font-size:14px;">${message}</span>
+        ${actionUrl ? `<div style="margin-top:8px;"><a href="${actionUrl}" style="color:#8E3A59;font-weight:bold;text-decoration:none;font-size:13px;">Ir →</a></div>` : ""}
+      `;
+      document.body.appendChild(toastEl);
+      setTimeout(() => toastEl.remove(), 6000);
+    }
+
+    // ── Recordatorio diario ─────────────────────────────────────────
+    socket.on("reminder:daily", (data) => showToast(data));
+
+    // ── Tip de bienestar ────────────────────────────────────────────
+    socket.on("tip:wellness", (data) => showToast(data));
+
+    // ── Sincronización multi-dispositivo ────────────────────────────
+    // Si la usuaria registra algo en otro dispositivo, refrescamos
+    // el dashboard / calendario para que se vea reflejado.
+    socket.on("log:created", () => {
+      if (location.pathname === "/dashboard" || location.pathname === "/calendario") {
+        showToast({
+          title: "Registro sincronizado",
+          message: "Se agregó un nuevo registro desde otro dispositivo"
+        });
+        setTimeout(() => location.reload(), 1500);
+      }
+    });
+
+    socket.on("cycle:created", () => {
+      if (location.pathname === "/dashboard" || location.pathname === "/calendario") {
+        setTimeout(() => location.reload(), 1500);
+      }
+    });
+
+    socket.on("cycle:updated", () => {
+      if (location.pathname === "/calendario") {
+        setTimeout(() => location.reload(), 1500);
+      }
+    });
+  })();
+</script>
+
+<style>
+  @keyframes mb-toast-in {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+</style>
