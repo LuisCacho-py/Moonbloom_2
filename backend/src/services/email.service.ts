@@ -40,7 +40,7 @@ const templateCache: Record<string, HandlebarsTemplateDelegate> = {};
 
 const renderTemplate = (templateName: string, data: object): string => {
   if (!templateCache[templateName]) {
-    const filePath = path.join(__dirname, "..", "templates", "email", `${templateName}.hbs`);
+    const filePath = path.join(__dirname, "..", "..", "templates", "email", `${templateName}.hbs`);
     const source = fs.readFileSync(filePath, "utf-8");
     templateCache[templateName] = Handlebars.compile(source);
   }

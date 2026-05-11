@@ -51,15 +51,10 @@ const userSchema = new mongoose.Schema<IUser>({
 
 // Hashea la contraseña antes de guardar
 // @ts-ignore — los overloads de pre() en Mongoose v9 son problemáticos con TS
-userSchema.pre("save", async function (this: IUser, next: any) {
-  if (!this.isModified("password") || !this.password) return next();
-  try {
-    const salt = await bcrypt.genSalt(SALT_ROUNDS);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (err) {
-    next(err as Error);
-  }
+userSchema.pre("save", async function (this: IUser) {
+  if (!this.isModified("password") || !this.password) return;
+  const salt = await bcrypt.genSalt(SALT_ROUNDS);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
 // Compara contraseña en login
