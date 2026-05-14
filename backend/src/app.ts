@@ -10,6 +10,10 @@ import cors from "cors";
 import path from "path";
 import cookieParser from "cookie-parser";
 import { engine } from "express-handlebars";
+import helmet from "helmet";
+import morgan from "morgan";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger";
 
 import connectDB from "./config/db";
 import passport from "./config/passport";
@@ -31,13 +35,14 @@ app.engine(
       allowProtoMethodsByDefault: true,
     },
     helpers: {
-      eq: (a: any, b: any) => a === b,
+      eq: (a: any, b: any) => String(a) === String(b),
       formatDate: (date: Date | string | null) => {
         if (!date) return "—";
         return new Date(date).toLocaleDateString("es-MX", {
           year: "numeric", month: "long", day: "numeric"
         });
-      }
+      },
+      toString: (val: any) => String(val),
     }
   })
 );
@@ -48,6 +53,8 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
 // ── Middleware Global ────────────────────────────────────────────────────
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(cors({
   origin: process.env.CORS_ORIGIN || "*",
   credentials: true
@@ -67,6 +74,9 @@ app.use("/api/auth",      authRoutes);
 app.use("/api/users",     userRoutes);
 app.use("/api/cycles",    cycleRoutes);
 app.use("/api/dailylogs", dailyLogRoutes);
+
+// ── Documentación Swagger ────────────────────────────────────────────────
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // ── Rutas UI (Handlebars) ────────────────────────────────────────────────
 import uiRoutes from "./routes/ui.routes";

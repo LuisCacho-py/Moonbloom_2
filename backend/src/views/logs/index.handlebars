@@ -1,0 +1,110 @@
+<div class="container py-4">
+
+  <!-- ── Cabecera ─────────────────────────────────────────────────────────── -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+      <h2 class="fw-bold mb-0">
+        <i class="bi bi-journal-richtext me-2" style="color:var(--mb-primary);"></i>Mis Registros Diarios
+      </h2>
+      <span class="text-muted">{{logs.length}} registro(s)</span>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="/registros/nuevo" class="btn btn-moon rounded-3">
+        <i class="bi bi-plus-circle-fill me-1"></i>Nuevo registro
+      </a>
+      <a href="/dashboard" class="btn btn-outline-secondary rounded-3">
+        <i class="bi bi-arrow-left me-1"></i>Dashboard
+      </a>
+    </div>
+  </div>
+
+  {{#if logs.length}}
+  <div class="row g-3">
+    {{#each logs}}
+    <div class="col-12">
+      <div class="mb-card">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+
+          <!-- Fecha y ciclo -->
+          <div>
+            <h6 class="fw-bold mb-1">
+              <i class="bi bi-calendar2-date me-1" style="color:var(--mb-primary);"></i>
+              {{formatDate this.date}}
+            </h6>
+            {{#if this.cycleId}}
+            <small class="text-muted">
+              <i class="bi bi-link-45deg me-1"></i>Ciclo: {{formatDate this.cycleId.startDate}}
+              {{#if this.cycleId.endDate}} – {{formatDate this.cycleId.endDate}}{{/if}}
+            </small>
+            {{/if}}
+          </div>
+
+          <!-- Botones -->
+          <div class="d-flex gap-2">
+            <a href="/registros/{{this._id}}/editar" class="btn btn-sm btn-outline-secondary rounded-3">
+              <i class="bi bi-pencil-fill me-1"></i>Editar
+            </a>
+            <form action="/registros/{{this._id}}/eliminar" method="POST"
+              onsubmit="return confirm('¿Eliminar este registro?')">
+              <button type="submit" class="btn btn-sm btn-outline-danger rounded-3">
+                <i class="bi bi-trash-fill me-1"></i>Eliminar
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Datos del registro -->
+        <div class="row g-3 mt-1">
+          {{#if this.mood}}
+          <div class="col-sm-4">
+            <div class="cycle-info-item">
+              <span class="ci-label"><i class="bi bi-emoji-smile me-1"></i>Ánimo</span>
+              <span class="ci-value text-capitalize">{{this.mood}}</span>
+            </div>
+          </div>
+          {{/if}}
+
+          {{#if this.flow}}
+          <div class="col-sm-4">
+            <div class="cycle-info-item">
+              <span class="ci-label"><i class="bi bi-droplet-fill me-1"></i>Flujo</span>
+              <span class="ci-value">{{this.flow}} / 5</span>
+            </div>
+          </div>
+          {{/if}}
+
+          {{#if this.symptoms.length}}
+          <div class="col-sm-4">
+            <div class="cycle-info-item">
+              <span class="ci-label"><i class="bi bi-activity me-1"></i>Síntomas</span>
+              <span class="ci-value">{{this.symptoms}}</span>
+            </div>
+          </div>
+          {{/if}}
+
+          {{#if this.notes}}
+          <div class="col-12">
+            <div class="cycle-info-item">
+              <span class="ci-label"><i class="bi bi-chat-left-text me-1"></i>Notas</span>
+              <span class="ci-value">{{this.notes}}</span>
+            </div>
+          </div>
+          {{/if}}
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+
+  {{else}}
+  <div class="mb-card empty-state">
+    <span class="empty-icon">📓</span>
+    <h5 class="fw-semibold mb-1">No tienes registros diarios aún</h5>
+    <p class="text-muted mb-3">Empieza a registrar cómo te sientes cada día.</p>
+    <a href="/registros/nuevo" class="btn btn-moon">
+      <i class="bi bi-plus-circle-fill me-1"></i>Crear mi primer registro
+    </a>
+  </div>
+  {{/if}}
+
+</div>

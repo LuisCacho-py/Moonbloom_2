@@ -1,41 +1,64 @@
-<!-- ── Cabecera ───────────────────────────────────────────────────────── -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <div>
-    <h2 class="fw-bold mb-0"><i class="bi bi-people-fill me-2" style="color:var(--mb-primary);"></i>Usuarias</h2>
-    <span class="text-muted">{{count}} registrada(s)</span>
-  </div>
-  <a href="/usuarios/nuevo" class="btn btn-moon">
-    <i class="bi bi-person-plus-fill me-2"></i>Registrar nueva usuaria
-  </a>
-</div>
+<div class="container py-4">
 
-<!-- ── Tabla ──────────────────────────────────────────────────────────── -->
-{{#if users.length}}
-<div class="mb-card p-0 overflow-hidden">
-  <table class="table mb-table mb-0">
-    <thead>
-      <tr>
-        <th class="ps-4">Nombre</th>
-        <th>Correo electrónico</th>
-        <th>Fecha de registro</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#each users}}
-      <tr>
-        <td class="ps-4 fw-medium">{{this.name}}</td>
-        <td>{{this.email}}</td>
-        <td>{{this.createdAt}}</td>
-      </tr>
-      {{/each}}
-    </tbody>
-  </table>
+  <!-- ── Cabecera ─────────────────────────────────────────────────────────── -->
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+      <h2 class="fw-bold mb-0"><i class="bi bi-people-fill me-2" style="color:var(--mb-primary);"></i>Usuarias</h2>
+      <span class="text-muted">{{count}} registrada(s)</span>
+    </div>
+    <div class="d-flex gap-2">
+      <a href="/usuarios/nuevo" class="btn btn-moon rounded-3">
+        <i class="bi bi-person-plus-fill me-2"></i>Registrar nueva usuaria
+      </a>
+      <a href="/dashboard" class="btn btn-outline-secondary rounded-3">
+        <i class="bi bi-arrow-left me-1"></i>Dashboard
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Tabla ──────────────────────────────────────────────────────────── -->
+  {{#if users.length}}
+  <div class="mb-card p-0 overflow-hidden">
+    <table class="table mb-table mb-0">
+      <thead>
+        <tr>
+          <th class="ps-4">Nombre</th>
+          <th>Correo electrónico</th>
+          <th>Fecha de registro</th>
+          <th class="text-end pe-4">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each users}}
+        <tr>
+          <td class="ps-4 fw-medium">{{this.name}}</td>
+          <td>{{this.email}}</td>
+          <td>{{formatDate this.createdAt}}</td>
+          <td class="text-end pe-4">
+            <div class="d-flex justify-content-end gap-2">
+              <a href="/usuarios/{{this._id}}/editar" class="btn btn-sm btn-outline-secondary rounded-3">
+                <i class="bi bi-pencil-fill me-1"></i>Editar
+              </a>
+              <form action="/usuarios/{{this._id}}/eliminar" method="POST"
+                onsubmit="return confirm('¿Eliminar a {{this.name}}? Esta acción no se puede deshacer.')">
+                <button type="submit" class="btn btn-sm btn-outline-danger rounded-3">
+                  <i class="bi bi-trash-fill me-1"></i>Eliminar
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+  </div>
+  {{else}}
+  <div class="mb-card empty-state">
+    <span class="empty-icon">👤</span>
+    <h5 class="fw-semibold mb-1">No hay usuarias registradas aún</h5>
+    <p class="text-muted mb-3">Comienza registrando la primera usuaria de MoonBloom.</p>
+    <a href="/usuarios/nuevo" class="btn btn-moon">Registrar ahora</a>
+  </div>
+  {{/if}}
+
 </div>
-{{else}}
-<div class="mb-card empty-state">
-  <span class="empty-icon">👤</span>
-  <h5 class="fw-semibold mb-1">No hay usuarias registradas aún</h5>
-  <p class="text-muted mb-3">Comienza registrando la primera usuaria de MoonBloom.</p>
-  <a href="/usuarios/nuevo" class="btn btn-moon">Registrar ahora</a>
-</div>
-{{/if}}

@@ -32,10 +32,15 @@
           {{#if this.durationDays}}
           <span class="badge-cycle">{{this.durationDays}} días</span>
           {{/if}}
-          <a href="/ciclos/{{this._id}}/editar" class="btn btn-sm btn-outline-secondary rounded-3"
-            title="Editar ciclo">
+          <a href="/ciclos/{{this._id}}/editar" class="btn btn-sm btn-outline-secondary rounded-3">
             <i class="bi bi-pencil-fill me-1"></i>Editar
           </a>
+          <form action="/ciclos/{{this._id}}/eliminar" method="POST" class="d-inline"
+            onsubmit="return confirm('¿Eliminar este ciclo? Esta acción no se puede deshacer.')">
+            <button type="submit" class="btn btn-sm btn-outline-danger rounded-3">
+              <i class="bi bi-trash-fill me-1"></i>Eliminar
+            </button>
+          </form>
         </div>
       </div>
       <div class="cycle-entry-body mt-2">

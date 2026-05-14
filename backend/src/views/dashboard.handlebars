@@ -71,7 +71,9 @@
           <div class="empty-state py-3">
             <span class="empty-icon" style="font-size:2.5rem;">📅</span>
             <p class="text-muted mb-2">No tienes ciclos registrados aún.</p>
-            <small class="text-muted">Usa la API <code>POST /api/cycles</code> para agregar tu primer ciclo.</small>
+            <a href="/ciclos/nuevo" class="btn btn-moon btn-sm">
+              <i class="bi bi-plus-circle-fill me-1"></i>Registrar mi primer ciclo
+            </a>
           </div>
         {{/if}}
       </div>
@@ -87,6 +89,9 @@
         <div class="d-grid gap-2">
           <a href="/registros/nuevo" class="btn btn-moon">
             <i class="bi bi-journal-plus me-2"></i>Registrar síntomas de hoy
+          </a>
+          <a href="/registros" class="btn btn-outline-secondary rounded-3">
+            <i class="bi bi-journal-richtext me-2"></i>Ver todos mis registros
           </a>
           <a href="/calendario" class="btn btn-outline-secondary rounded-3">
             <i class="bi bi-calendar-heart-fill me-2"></i>Ver mi calendario
