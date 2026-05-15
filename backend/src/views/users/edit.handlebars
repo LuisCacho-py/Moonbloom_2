@@ -25,7 +25,7 @@
         </div>
         {{/if}}
 
-        <form action="/usuarios/{{user.idStr}}/editar" method="POST" class="mb-form">
+        <form action="/usuarios/{{user.idStr}}/editar" method="POST" class="mb-form" autocomplete="off">
 
           <div class="mb-3">
             <label for="name" class="form-label">Nombre completo</label>
@@ -41,7 +41,7 @@
             <div class="input-group-icon">
               <i class="bi bi-envelope-fill field-icon"></i>
               <input type="email" id="email" name="email" class="form-control ps-5"
-                value="{{user.email}}" required />
+                value="{{user.email}}" required autocomplete="off" />
             </div>
           </div>
 
@@ -53,7 +53,7 @@
             <div class="input-group-icon">
               <i class="bi bi-lock-fill field-icon"></i>
               <input type="password" id="password" name="password" class="form-control ps-5"
-                minlength="6" placeholder="Mínimo 6 caracteres" />
+                minlength="6" autocomplete="new-password" />
             </div>
           </div>
 
