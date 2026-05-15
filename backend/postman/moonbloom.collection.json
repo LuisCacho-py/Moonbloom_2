@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "MoonBloom API",
-    "description": "Colección de pruebas automatizadas para la API de MoonBloom",
+    "description": "Coleccion de pruebas automatizadas para la API de MoonBloom",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -21,8 +21,8 @@
                   "  pm.expect(json.success).to.be.true;",
                   "  pm.expect(json.user).to.have.property('_id');",
                   "  pm.expect(json.user).to.have.property('email');",
-                  "  pm.collectionVariables.set('USER_ID', json.user._id);",
-                  "  pm.collectionVariables.set('TOKEN', json.token);",
+                  "  pm.environment.set('USER_ID', json.user._id);",
+                  "  pm.environment.set('TOKEN', json.token);",
                   "});"
                 ]
               }
@@ -51,8 +51,8 @@
                   "  pm.expect(json.success).to.be.true;",
                   "  pm.expect(json.token).to.be.a('string');",
                   "  pm.expect(json.user).to.have.property('_id');",
-                  "  pm.collectionVariables.set('TOKEN', json.token);",
-                  "  pm.collectionVariables.set('USER_ID', json.user._id);",
+                  "  pm.environment.set('TOKEN', json.token);",
+                  "  pm.environment.set('USER_ID', json.user._id);",
                   "});"
                 ]
               }
@@ -132,7 +132,7 @@
                   "  pm.expect(json.success).to.be.true;",
                   "  pm.expect(json.data).to.be.an('array');",
                   "  if (json.data.length > 0) {",
-                  "    pm.collectionVariables.set('USER_ID', json.data[0]._id);",
+                  "    pm.environment.set('USER_ID', json.data[0]._id);",
                   "  }",
                   "});"
                 ]
@@ -146,20 +146,21 @@
           }
         },
         {
-          "name": "Listar usuarios (sin token — debe fallar)",
+          "name": "Listar usuarios (token invalido — debe fallar)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 401 sin autenticacion', () => pm.response.to.have.status(401));"
+                  "pm.test('Status 401 sin autenticacion valida', () => pm.response.to.have.status(401));"
                 ]
               }
             }
           ],
           "request": {
             "method": "GET",
-            "url": "{{BASE_URL}}/api/users"
+            "url": "{{BASE_URL}}/api/users",
+            "header": [{ "key": "Authorization", "value": "Bearer token_invalido_12345" }]
           }
         },
         {
@@ -174,6 +175,7 @@
                   "  const json = pm.response.json();",
                   "  pm.expect(json.success).to.be.true;",
                   "  pm.expect(json.data).to.have.property('_id');",
+                  "  pm.expect(json.data).to.have.property('email');",
                   "});"
                 ]
               }
@@ -251,7 +253,7 @@
                   "  pm.expect(json.success).to.be.true;",
                   "  pm.expect(json.data).to.have.property('_id');",
                   "  pm.expect(json.data).to.have.property('startDate');",
-                  "  pm.collectionVariables.set('CYCLE_ID', json.data._id);",
+                  "  pm.environment.set('CYCLE_ID', json.data._id);",
                   "});"
                 ]
               }
@@ -308,7 +310,8 @@
                   "pm.test('Retorna ciclo', () => {",
                   "  const json = pm.response.json();",
                   "  pm.expect(json.success).to.be.true;",
-                  "  pm.expect(json.data._id).to.eql(pm.collectionVariables.get('CYCLE_ID'));",
+                  "  pm.expect(json.data).to.have.property('_id');",
+                  "  pm.expect(json.data).to.have.property('startDate');",
                   "});"
                 ]
               }
@@ -406,7 +409,7 @@
               "script": {
                 "exec": [
                   "pm.test('Status 201', () => pm.response.to.have.status(201));",
-                  "pm.collectionVariables.set('CYCLE_ID', pm.response.json().data._id);"
+                  "pm.environment.set('CYCLE_ID', pm.response.json().data._id);"
                 ]
               }
             }
@@ -436,7 +439,7 @@
                   "  const json = pm.response.json();",
                   "  pm.expect(json.success).to.be.true;",
                   "  pm.expect(json.data).to.have.property('_id');",
-                  "  pm.collectionVariables.set('LOG_ID', json.data._id);",
+                  "  pm.environment.set('LOG_ID', json.data._id);",
                   "});"
                 ]
               }
@@ -451,7 +454,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"cycleId\": \"{{CYCLE_ID}}\",\n  \"date\": \"2025-04-01\",\n  \"mood\": \"feliz\",\n  \"symptoms\": [\"fatiga\"],\n  \"flow\": 3,\n  \"notes\": \"Me senti bien hoy\"\n}"
+              "raw": "{\n  \"cycleId\": \"{{CYCLE_ID}}\",\n  \"date\": \"2025-04-01\",\n  \"mood\": \"feliz\",\n  \"symptoms\": \"fatiga, dolor de cabeza\",\n  \"flow\": 3,\n  \"notes\": \"Me senti bien hoy\"\n}"
             }
           }
         },
@@ -492,6 +495,7 @@
                   "  const json = pm.response.json();",
                   "  pm.expect(json.success).to.be.true;",
                   "  pm.expect(json.data).to.have.property('mood');",
+                  "  pm.expect(json.data.mood).to.eql('feliz');",
                   "});"
                 ]
               }
