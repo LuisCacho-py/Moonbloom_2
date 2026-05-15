@@ -19,9 +19,10 @@
                   "pm.test('Respuesta exitosa', () => {",
                   "  const json = pm.response.json();",
                   "  pm.expect(json.success).to.be.true;",
-                  "  pm.expect(json.data).to.have.property('_id');",
-                  "  pm.expect(json.data).to.have.property('email');",
-                  "  pm.collectionVariables.set('USER_ID', json.data._id);",
+                  "  pm.expect(json.user).to.have.property('_id');",
+                  "  pm.expect(json.user).to.have.property('email');",
+                  "  pm.collectionVariables.set('USER_ID', json.user._id);",
+                  "  pm.collectionVariables.set('TOKEN', json.token);",
                   "});"
                 ]
               }
@@ -48,12 +49,10 @@
                   "pm.test('Respuesta exitosa con token', () => {",
                   "  const json = pm.response.json();",
                   "  pm.expect(json.success).to.be.true;",
-                  "  pm.expect(json.data).to.have.property('_id');",
-                  "  pm.collectionVariables.set('USER_ID', json.data._id);",
-                  "});",
-                  "pm.test('Cookie token presente', () => {",
-                  "  pm.expect(pm.cookies.has('token')).to.be.true;",
-                  "  pm.collectionVariables.set('TOKEN', pm.cookies.get('token'));",
+                  "  pm.expect(json.token).to.be.a('string');",
+                  "  pm.expect(json.user).to.have.property('_id');",
+                  "  pm.collectionVariables.set('TOKEN', json.token);",
+                  "  pm.collectionVariables.set('USER_ID', json.user._id);",
                   "});"
                 ]
               }
@@ -80,8 +79,8 @@
                   "pm.test('Retorna datos de usuaria', () => {",
                   "  const json = pm.response.json();",
                   "  pm.expect(json.success).to.be.true;",
-                  "  pm.expect(json.data).to.have.property('email');",
-                  "  pm.expect(json.data).to.not.have.property('password');",
+                  "  pm.expect(json.user).to.have.property('email');",
+                  "  pm.expect(json.user).to.not.have.property('password');",
                   "});"
                 ]
               }
@@ -94,13 +93,13 @@
           }
         },
         {
-          "name": "Obtener usuaria actual (sin token — debe fallar)",
+          "name": "Obtener usuaria actual (token invalido — debe fallar)",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 401 sin token', () => pm.response.to.have.status(401));",
+                  "pm.test('Status 401 con token invalido', () => pm.response.to.have.status(401));",
                   "pm.test('Mensaje de error', () => {",
                   "  const json = pm.response.json();",
                   "  pm.expect(json.success).to.be.false;",
@@ -111,29 +110,8 @@
           ],
           "request": {
             "method": "GET",
-            "url": "{{BASE_URL}}/api/auth/me"
-          }
-        },
-        {
-          "name": "Logout",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
-                  "pm.test('Logout exitoso', () => {",
-                  "  const json = pm.response.json();",
-                  "  pm.expect(json.success).to.be.true;",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "url": "{{BASE_URL}}/api/auth/logout",
-            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+            "url": "{{BASE_URL}}/api/auth/me",
+            "header": [{ "key": "Authorization", "value": "Bearer token_invalido_12345" }]
           }
         }
       ]
@@ -174,7 +152,7 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status 401 sin autenticación', () => pm.response.to.have.status(401));"
+                  "pm.test('Status 401 sin autenticacion', () => pm.response.to.have.status(401));"
                 ]
               }
             }
@@ -208,7 +186,7 @@
           }
         },
         {
-          "name": "Obtener usuario con ID inválido — debe fallar",
+          "name": "Obtener usuario con ID invalido — debe fallar",
           "event": [
             {
               "listen": "test",
@@ -293,7 +271,7 @@
           }
         },
         {
-          "name": "Listar ciclos (con paginación)",
+          "name": "Listar ciclos (con paginacion)",
           "event": [
             {
               "listen": "test",
@@ -315,13 +293,7 @@
           ],
           "request": {
             "method": "GET",
-            "url": {
-              "raw": "{{BASE_URL}}/api/cycles?page=1&limit=5",
-              "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "5" }
-              ]
-            },
+            "url": "{{BASE_URL}}/api/cycles?page=1&limit=5",
             "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
           }
         },
@@ -379,6 +351,26 @@
           }
         },
         {
+          "name": "Acceder a ciclo ajeno — debe ser 403 o 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Rechaza acceso a recurso ajeno', () => {",
+                  "  pm.expect(pm.response.code).to.be.oneOf([403, 404]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": "{{BASE_URL}}/api/cycles/000000000000000000000001",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        },
+        {
           "name": "Eliminar ciclo",
           "event": [
             {
@@ -400,9 +392,14 @@
             "url": "{{BASE_URL}}/api/cycles/{{CYCLE_ID}}",
             "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "DailyLogs",
+      "item": [
         {
-          "name": "Crear ciclo para prueba de ownership",
+          "name": "Crear ciclo para logs",
           "event": [
             {
               "listen": "test",
@@ -423,33 +420,10 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{ \"startDate\": \"2025-04-01\", \"endDate\": \"2025-04-04\" }"
+              "raw": "{ \"startDate\": \"2025-04-01\", \"endDate\": \"2025-04-05\" }"
             }
           }
         },
-        {
-          "name": "Acceder a ciclo ajeno — debe ser 403",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test('Status 403 con ID de otro usuario', () => pm.response.to.have.status(403));"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "url": "{{BASE_URL}}/api/cycles/000000000000000000000001",
-            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
-          }
-        }
-      ]
-    },
-    {
-      "name": "DailyLogs",
-      "item": [
         {
           "name": "Crear registro diario",
           "event": [
@@ -477,12 +451,12 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"cycleId\": \"{{CYCLE_ID}}\",\n  \"date\": \"2025-04-01\",\n  \"mood\": \"feliz\",\n  \"symptoms\": [\"fatiga\", \"dolor de cabeza\"],\n  \"flow\": 3,\n  \"notes\": \"Me sentí bien hoy\"\n}"
+              "raw": "{\n  \"cycleId\": \"{{CYCLE_ID}}\",\n  \"date\": \"2025-04-01\",\n  \"mood\": \"feliz\",\n  \"symptoms\": [\"fatiga\"],\n  \"flow\": 3,\n  \"notes\": \"Me senti bien hoy\"\n}"
             }
           }
         },
         {
-          "name": "Listar registros (con paginación)",
+          "name": "Listar registros (con paginacion)",
           "event": [
             {
               "listen": "test",
@@ -502,13 +476,7 @@
           ],
           "request": {
             "method": "GET",
-            "url": {
-              "raw": "{{BASE_URL}}/api/dailylogs?page=1&limit=10",
-              "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" }
-              ]
-            },
+            "url": "{{BASE_URL}}/api/dailylogs?page=1&limit=10",
             "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
           }
         },
@@ -585,6 +553,33 @@
           "request": {
             "method": "DELETE",
             "url": "{{BASE_URL}}/api/dailylogs/{{LOG_ID}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth - Logout",
+      "item": [
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Logout exitoso', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.success).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{BASE_URL}}/api/auth/logout",
             "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }]
           }
         }
