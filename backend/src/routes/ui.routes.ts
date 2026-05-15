@@ -195,7 +195,8 @@ router.post("/registros/:id/eliminar", async (req: Request, res: Response): Prom
 // ── Usuarias (administración) ─────────────────────────────────────────────
 router.get("/usuarios", async (req: Request, res: Response): Promise<void> => {
   try {
-    const users = await User.find().sort({ createdAt: -1 }).lean();
+    const raw = await User.find().sort({ createdAt: -1 }).lean();
+    const users = raw.map((u: any) => ({ ...u, idStr: u._id.toString() }));
     res.render("users/index", { users, count: users.length });
   } catch (error: any) {
     res.status(500).send(error.message);
@@ -224,8 +225,9 @@ router.post("/usuarios/nuevo", async (req: Request, res: Response): Promise<void
 
 router.get("/usuarios/:id/editar", async (req: Request, res: Response): Promise<void> => {
   try {
-    const user = await User.findById(req.params.id).lean();
+    const user: any = await User.findById(req.params.id).lean();
     if (!user) { res.redirect("/usuarios"); return; }
+    user.idStr = user._id.toString();
     res.render("users/edit", { user });
   } catch {
     res.redirect("/usuarios");
